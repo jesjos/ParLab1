@@ -9,7 +9,7 @@ import TSim.*;
 public class Lab1 {
   private static TSimInterface sim = TSimInterface.getInstance();
   
-  private Thread one = new Thread (new Train());
+  private Thread one = new Thread (new Train(1,20));
   
   public static void main(String[] args) {
     try {
