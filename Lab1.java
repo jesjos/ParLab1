@@ -13,7 +13,7 @@ public class Lab1 {
   
   public static void main(String[] args) {
     try {
-      sim.setSpeed(1,100);
+      sim.setSpeed(1,20);
       SensorEvent e = sim.getSensor(1);
       sim.setSwitch(17,7, TSim.TSimInterface.SWITCH_RIGHT);
       sim.setSwitch(4,9,TSim.TSimInterface.SWITCH_RIGHT);
