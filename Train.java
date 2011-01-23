@@ -5,7 +5,6 @@
  */
  
  public class Train implements Runnable {
-   
    // Denotes whether the train in question is traveling down or up the track
    private boolean goingDown;
    
