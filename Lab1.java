@@ -1,4 +1,5 @@
 import TSim.*;
+import java.util.concurrent.Semaphore;
 
 /**
  * Concurrent programming - Labb 1
