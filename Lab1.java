@@ -17,6 +17,7 @@ public class Lab1 {
   
   public Lab1() {
     sim = TSimInterface.getInstance();
+    semaphores = new Semaphore[8];
     for (int i = 0; i < 5; i++) {
      semaphores[i] = new Semaphore(1, true);
     }
