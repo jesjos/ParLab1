@@ -17,8 +17,8 @@ public class Lab1 {
   
   public Lab1() {
     sim = TSimInterface.getInstance();
-    one = new Thread (new Train(1,20,this.sim));
-    two = new Thread (new Train(1,20,this.sim));
+    one = new Thread (new Train(1,20,this.semaphore,this.sim));
+    two = new Thread (new Train(1,20,this.semaphore,this.sim));
     
     for (int i = 0; i < 5; i++) {
      semaphores[i] = new Semaphore(1, true);

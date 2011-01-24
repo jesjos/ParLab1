@@ -38,7 +38,7 @@ import TSim.*;
    public void run() {
      sim.setSpeed(this.id, this.speed);
      SensorEvent e = sim.getSensor(this.id);
-     this.goingDown = e.getypos() == 3;
+     this.goingDown = e.getYpos() == 3;
      
    }
  }
