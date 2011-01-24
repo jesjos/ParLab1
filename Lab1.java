@@ -7,19 +7,30 @@ import TSim.*;
  */
  
 public class Lab1 {
-  private static TSimInterface sim = TSimInterface.getInstance();
+  private TSimInterface sim;
   
-  private Thread one = new Thread (new Train(1,20));
+  private Thread one;
+  private Thread two;
+  
+  Semaphore[] semaphores;
+  
+  public Lab1() {
+    sim = TSimInterface.getInstance();
+    one = new Thread (new Train(1,20,this.sim));
+    two = new Thread (new Train(1,20,this.sim));
+    
+    for (int i = 0; i < 5; i++) {
+     semaphores[i] = new Semaphore(1, true);
+    }
+  }
+  
+  public void start() {
+    one.start();
+    two.start();
+  }
   
   public static void main(String[] args) {
-    try {
-      sim.setSpeed(1,20);
-      SensorEvent e = sim.getSensor(1);
-      sim.setSwitch(17,7, TSim.TSimInterface.SWITCH_RIGHT);
-      sim.setSwitch(4,9,TSim.TSimInterface.SWITCH_RIGHT);
-      sim.setSwitch(3,11,TSim.TSimInterface.SWITCH_RIGHT);
-    } catch (Exception e) {
-      System.err.println("Oh fuckness!");
-    }
+    Lab1 lab = new Lab1();
+    lab.start();
   }
 }
