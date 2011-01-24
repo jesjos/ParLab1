@@ -20,8 +20,8 @@ public class Lab1 {
     for (int i = 0; i < 5; i++) {
      semaphores[i] = new Semaphore(1, true);
     }
-    one = new Thread (new Train(1,20,this.semaphore,this.sim));
-    two = new Thread (new Train(1,20,this.semaphore,this.sim));
+    one = new Thread (new Train(1,20,this.semaphores,this.sim));
+    two = new Thread (new Train(1,20,this.semaphores,this.sim));
   }
   
   public void start() {
