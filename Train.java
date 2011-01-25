@@ -141,7 +141,7 @@ import TSim.*;
        System.err.println(exc1.getMessage());
      }
      
-     // Wait for the sensor and record the direction of the train
+     // Wait for the sensor and record the initial direction of the train
      try {
        e = sim.getSensor(this.id);
        this.goingDown = e.getYpos() == 3;
@@ -152,6 +152,7 @@ import TSim.*;
        System.err.println("Nu är jag initierad. Min state är: " + state);
      } catch (Exception exc2) {
        System.err.println(exc2.getMessage());
+       System.exit(1);
      }
      
      getSensorAndReact();
