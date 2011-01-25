@@ -147,7 +147,8 @@ import TSim.*;
      // Wait for the sensor and record the initial direction of the train
      try {
        e = sim.getSensor(this.id);
-       this.goingDown = e.getYpos() == 3;
+       System.err.println("Y-position: " + e.getYpos());
+       this.goingDown = e.getYpos() == 7;
        this.state = this.goingDown ? 0 : 6;
        acquire(state);
        this.previous = this.semaphores[state];
