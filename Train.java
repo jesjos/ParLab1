@@ -117,7 +117,7 @@ import TSim.*;
          if (state == 6) {
            acquire(5);
            setSwitch(3, TSimInterface.SWITCH_LEFT);
-           state();
+           start();
            this.previous.release();
            this.state = 5;
          }
