@@ -14,7 +14,7 @@ import TSim.*;
  public class Train implements Runnable {
    public static Point[] switches = {new Point(17,7), new Point(15,9), new Point(4,9), new Point(3,11)};
    
-   public Semaphore previous;
+   private Semaphore previous;
    
    // Denotes whether the train in question is travelling down or up the track
    private boolean goingDown;
@@ -27,6 +27,9 @@ import TSim.*;
    
    // The current state which the train is in, i.e. where it is located in the sequence of tracks and stops
    private int state;
+   
+   // The current SensorEvent being handled
+   private SensorEvent event;
    
    // The simulator controller
    private TSimInterface sim;
@@ -93,10 +96,12 @@ import TSim.*;
    }
    
    private void getSensor() {
-     SensorEvent event;
-     System.err.println("Looking for new signals");
      try {
        event = this.sim.getSensor(this.id);
+       if (event.getStatus() == SensorEvent.INACTIVE) {
+         event = this.sim.getSensor(this.id);
+       }
+       this.semaphores[state].release();
      } catch (Exception e) {
        e.printStackTrace();
      }
@@ -113,7 +118,7 @@ import TSim.*;
      
        // Logic for trains travelling downwards
        if (this.goingDown) {
-         if (state == 0) {
+         if (state == 0 || state == 1) {
            acquire(2);
            setSwitch(0, TSimInterface.SWITCH_RIGHT);
            start();
@@ -133,29 +138,48 @@ import TSim.*;
            start();
            this.state = 5;
          }
+         else if (state == 6) {
+           try {
+             this.sim.setSpeed(this.id, this.speed/2);
+           } catch (CommandException exc) {
+             exc.printStackTrace();
+           }
+           this.state = 7;
+           getSensor();
+         }
+         else if (state == 8) {
+           stop();
+           nap(speed * 100);
+           nap(2000);
+           this.goingDown = false;
+           start();
+           this.state = 6;
+         }
        } // end if going down
       
        else if (!this.goingDown) {
-         if (state == 6) {
+         if (state == 6 || state == 7) {
            acquire(5);
            setSwitch(3, TSimInterface.SWITCH_LEFT);
            start();
-           this.previous.release();
            this.state = 5;
+         }
+         else if (state == 5) {
+           chooseBetween(3,4,3);
+         }
+         else if (state == 3 || state == 4) {
+           acquire(2);
+           setSwitch(1, state == 3 ? TSimInterface.SWITCH_RIGHT, TSimInterface.SWITCH_LEFT);
+           start();
+           this.state = 2;
+         }
+         else if (state == 2) {
+           chooseBetween(0,1,0);
          }
        } // end if not going down
        
-       // Start looking for new signals
-       System.err.println("Looking for new signals");
-       try {
-         event = this.sim.getSensor(this.id);
-         if (event.getStatus() == SensorEvent.INACTIVE) {
-           event = this.sim.getSensor(this.id);
-         }
-         this.semaphores[state].release();
-       } catch (Exception e) {
-         e.printStackTrace();
-       }
+       getSensor();
+       
      } // end while
    }
    
@@ -184,5 +208,12 @@ import TSim.*;
      
      getSensorAndReact();
      
+   }
+   private static void nap(int millisecs) {
+     try {
+       Thread.sleep(millisecs);
+     } catch (InterruptedException e) {
+       System.err.println(e.getMessage());
+     }
    }
  }
