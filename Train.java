@@ -64,15 +64,13 @@ import TSim.*;
    private void acquire(int semaphore) {
      try {
        this.semaphores[semaphore].acquire();
-       System.err.println("Acquired: " + semaphore);
+       System.err.println("Train #" + this.id + " acquired " + semaphore);
      } catch (InterruptedException e) {
        e.printStackTrace();
      }
    }
    
    private void setSwitch(int s, int direction) {
-     
-     System.err.println("Nu går vi in i setSwitch");
      try {
        this.sim.setSwitch(switches[s].x, switches[s].y, direction);
      } catch (CommandException e) {
@@ -87,6 +85,7 @@ import TSim.*;
      int direction;
      if (this.semaphores[left].tryAcquire()) {
        direction = left;
+       System.err.println("Train #" + this.id + " acquired " + direction);
      } else {
        acquire(right);
        direction = right;
@@ -104,14 +103,15 @@ import TSim.*;
          event = this.sim.getSensor(this.id);
        }
        this.semaphores[state].release();
+       System.err.println("Train # " + this.id + " has released " + state);
        this.state = nextState;
+       System.err.println("Train # " + this.id + " has next state " + nextState);
      } catch (Exception e) {
        e.printStackTrace();
      }
    }
    
    private void getSensorAndReact(){
-     System.err.println("Nu går vi in i getSensorAndReact. Min state är " + state);
      SensorEvent event;
      
      // Start the main loop
@@ -145,13 +145,14 @@ import TSim.*;
            } catch (CommandException exc) {
              exc.printStackTrace();
            }
-           nap(this.speed *100);
+           nap(Math.abs(this.speed *100));
            stop();
            nap(2000);
            this.speed = this.speed*(-1);
            this.goingDown = false;
            this.nextState = 5;
            start();
+           getSensor();
          }
        } // end if going down
       
@@ -172,10 +173,22 @@ import TSim.*;
            this.nextState = 2;
          }
          else if (state == 2) {
-           chooseBetween(0,1,0);
+           chooseBetween(1,0,0);
          }
          else if (state == 0 || state == 1) {
-           
+           try {
+             this.sim.setSpeed(this.id, this.speed/2);
+           } catch (CommandException exc) {
+             exc.printStackTrace();
+           }
+           nap(Math.abs(this.speed *100));
+           stop();
+           nap(2000);
+           this.speed = this.speed*(-1);
+           this.goingDown = true;
+           this.nextState = 2;
+           start();
+           getSensor();
          }
        } // end if not going down
        
