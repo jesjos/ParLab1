@@ -23,12 +23,12 @@ public class Lab1 {
      semaphores[i] = new Semaphore(1, true);
     }
     one = new Thread (new Train(1,20,this.semaphores,this.sim));
-    //two = new Thread (new Train(1,20,this.semaphores,this.sim));
+    two = new Thread (new Train(2,20,this.semaphores,this.sim));
   }
   
   public void start() {
     one.start();
-    //two.start();
+    two.start();
   }
   
   public static void main(String[] args) {

@@ -19,6 +19,8 @@ import TSim.*;
    // Denotes whether the train in question is travelling down or up the track
    private boolean goingDown;
    
+   private int nextState;
+   
    // The speed with which the train travels
    private int speed;
    
@@ -92,7 +94,7 @@ import TSim.*;
      // Sets the desired switch
      setSwitch(s, direction == left ? TSimInterface.SWITCH_LEFT : TSimInterface.SWITCH_RIGHT);
      start();
-     this.state = direction;
+     this.nextState = direction;
    }
    
    private void getSensor() {
@@ -102,6 +104,7 @@ import TSim.*;
          event = this.sim.getSensor(this.id);
        }
        this.semaphores[state].release();
+       this.state = nextState;
      } catch (Exception e) {
        e.printStackTrace();
      }
@@ -118,16 +121,14 @@ import TSim.*;
      
        // Logic for trains travelling downwards
        if (this.goingDown) {
-         if (state == 0 || state == 1) {
+         if (state == 0 || state == 1) {
            acquire(2);
            setSwitch(0, TSimInterface.SWITCH_RIGHT);
            start();
-           this.state = 2;
-           //getSensor();
+           this.nextState = 2;
          }
          else if (state == 2) {
            chooseBetween(4,3,1);
-           //getSensor();
          }
          else if (state == 5) {
            chooseBetween(6,7,3);
@@ -136,45 +137,45 @@ import TSim.*;
            acquire(5);
            setSwitch(2, state == 3 ? TSimInterface.SWITCH_LEFT : TSimInterface.SWITCH_RIGHT);
            start();
-           this.state = 5;
+           this.nextState = 5;
          }
-         else if (state == 6) {
+         else if (state == 6 || state == 7) {
            try {
              this.sim.setSpeed(this.id, this.speed/2);
            } catch (CommandException exc) {
              exc.printStackTrace();
            }
-           this.state = 7;
-           getSensor();
-         }
-         else if (state == 8) {
+           nap(this.speed *100);
            stop();
-           nap(speed * 100);
            nap(2000);
+           this.speed = this.speed*(-1);
            this.goingDown = false;
+           this.nextState = 5;
            start();
-           this.state = 6;
          }
        } // end if going down
       
        else if (!this.goingDown) {
-         if (state == 6 || state == 7) {
+         if (state == 6 || state == 7) {
            acquire(5);
-           setSwitch(3, TSimInterface.SWITCH_LEFT);
+           setSwitch(3, state == 6 ? TSimInterface.SWITCH_LEFT : TSimInterface.SWITCH_RIGHT);
            start();
-           this.state = 5;
+           this.nextState = 5;
          }
          else if (state == 5) {
            chooseBetween(3,4,3);
          }
-         else if (state == 3 || state == 4) {
+         else if (state == 3 || state == 4) {
            acquire(2);
-           setSwitch(1, state == 3 ? TSimInterface.SWITCH_RIGHT, TSimInterface.SWITCH_LEFT);
+           setSwitch(1, state == 3 ? TSimInterface.SWITCH_RIGHT : TSimInterface.SWITCH_LEFT);
            start();
-           this.state = 2;
+           this.nextState = 2;
          }
          else if (state == 2) {
            chooseBetween(0,1,0);
+         }
+         else if (state == 0 || state == 1) {
+           
          }
        } // end if not going down
        
