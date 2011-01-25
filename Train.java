@@ -59,6 +59,7 @@ import TSim.*;
    private void acquire(int semaphore) {
      try {
        this.semaphores[semaphore].acquire();
+       System.err.println("Acquired: " + semaphore);
      } catch (InterruptedException e) {
        e.printStackTrace();
      }
@@ -76,17 +77,29 @@ import TSim.*;
    
    // Chooses between two possible directions depending on which is available. Always goes left first. Changes switch accordingly.
    private void chooseBetween(int left, int right, int s) {
+     System.err.println("Choose between: left " + left + " right " + right);
      // Determines which direction is available and acquires it
-     int direction = this.semaphores[left].tryAcquire() ? left : right;
-     acquire(direction);
+     int direction;
+     if (this.semaphores[left].tryAcquire()) {
+       direction = left;
+     } else {
+       acquire(right);
+       direction = right;
+     }
      // Sets the desired switch
      setSwitch(s, direction == left ? TSimInterface.SWITCH_LEFT : TSimInterface.SWITCH_RIGHT);
      start();
-     // Releases
-     this.previous.release();
-     // Saves the current semaphore for later release
-     this.previous = semaphores[direction];
      this.state = direction;
+   }
+   
+   private void getSensor() {
+     SensorEvent event;
+     System.err.println("Looking for new signals");
+     try {
+       event = this.sim.getSensor(this.id);
+     } catch (Exception e) {
+       e.printStackTrace();
+     }
    }
    
    private void getSensorAndReact(){
@@ -101,33 +114,28 @@ import TSim.*;
        // Logic for trains travelling downwards
        if (this.goingDown) {
          if (state == 0) {
-           System.err.println("If state is 0");
            acquire(2);
-           System.err.println("Acquire 2");
            setSwitch(0, TSimInterface.SWITCH_RIGHT);
-           System.err.println("set switch");
            start();
-           // Release the preceding track
-           this.previous.release();
-           this.previous = this.semaphores(2);
            this.state = 2;
+           //getSensor();
          }
-         if (state == 2) {
-           chooseBetween(3,4,1);
+         else if (state == 2) {
+           chooseBetween(4,3,1);
+           //getSensor();
          }
-         if (state == 6) {
+         else if (state == 5) {
            chooseBetween(6,7,3);
          }
-         if (state == 3 || state == 4) {
+         else if (state == 3 || state == 4) {
            acquire(5);
            setSwitch(2, state == 3 ? TSimInterface.SWITCH_LEFT : TSimInterface.SWITCH_RIGHT);
            start();
-           this.semaphores[state].release();
            this.state = 5;
          }
        } // end if going down
       
-       if (!this.goingDown) {
+       else if (!this.goingDown) {
          if (state == 6) {
            acquire(5);
            setSwitch(3, TSimInterface.SWITCH_LEFT);
@@ -141,6 +149,10 @@ import TSim.*;
        System.err.println("Looking for new signals");
        try {
          event = this.sim.getSensor(this.id);
+         if (event.getStatus() == SensorEvent.INACTIVE) {
+           event = this.sim.getSensor(this.id);
+         }
+         this.semaphores[state].release();
        } catch (Exception e) {
          e.printStackTrace();
        }
@@ -155,6 +167,8 @@ import TSim.*;
      // Wait for the sensor and record the initial direction of the train
      try {
        e = sim.getSensor(this.id);
+       if (e.getStatus() == SensorEvent.INACTIVE)
+         e = sim.getSensor(this.id);
        System.err.println(e);
        System.err.println("Y-position: " + e.getYpos());
        this.goingDown = e.getYpos() == 7;
