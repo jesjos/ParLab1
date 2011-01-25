@@ -128,7 +128,9 @@ import TSim.*;
        
        // Start looking for new signals
        try {
-         this.sim.getSensor(this.id);
+         do {
+           event = this.sim.getSensor(this.id)
+         } while (event.status == SensorEvent.ACTIVE);
        } catch (Exception e) {
          e.printStackTrace();
        }
