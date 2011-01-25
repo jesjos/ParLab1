@@ -128,7 +128,9 @@ import TSim.*;
        
        // Start looking for new signals
        try {
-         this.sim.getSensor(this.id);
+         do {
+           event = this.sim.getSensor(this.id)
+         } while (event.status == SensorEvent.ACTIVE);
        } catch (Exception e) {
          e.printStackTrace();
        }
@@ -146,7 +148,7 @@ import TSim.*;
      
      // Wait for the sensor and record the initial direction of the train
      try {
-       e = sim.getSensor(this.id);
+       e = sim.getSensor(this.id
        this.goingDown = e.getYpos() == 3;
        this.state = this.goingDown ? 0 : 6;
        acquire(state);
