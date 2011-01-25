@@ -64,6 +64,8 @@ import TSim.*;
    }
    
    private void setSwitch(int s, int direction) {
+     
+     System.err.println("Nu går vi in i setSwitch");
      try {
        this.sim.setSwitch(switches[s].x, switches[s].y, direction);
      } catch (CommandException e) {
@@ -83,6 +85,8 @@ import TSim.*;
    }
    
    private void getSensorAndReact(){
+     
+       System.err.println("Nu går vi in i getSensorAndReact");
      SensorEvent event;
      try {
        event = this.sim.getSensor(this.id);
