@@ -121,8 +121,9 @@ import TSim.*;
          if (state == 3 || state == 4) {
            acquire(5);
            setSwitch(2, state == 3 ? TSimInterface.SWITCH_LEFT : TSimInterface.SWITCH_RIGHT);
-           start()
-           
+           start();
+           this.semaphores[state].release();
+           this.state = 5;
          }
        } // end if going down
       
