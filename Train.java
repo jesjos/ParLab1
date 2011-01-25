@@ -146,9 +146,10 @@ import TSim.*;
        e = sim.getSensor(this.id);
        this.goingDown = e.getYpos() == 3;
        this.state = this.goingDown ? 0 : 6;
+       acquire(state);
        this.previous = this.semaphores[state];
        setSwitch(goingDown ? 0 : 3, goingDown ? TSimInterface.SWITCH_RIGHT : TSimInterface.SWITCH_LEFT);
-       System.err.println("Nu är jag initierad");
+       System.err.println("Nu är jag initierad. Min state är: " + state);
      } catch (Exception exc2) {
        System.err.println(exc2.getMessage());
      }
