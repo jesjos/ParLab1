@@ -85,8 +85,7 @@ import TSim.*;
    }
    
    private void getSensorAndReact(){
-     
-       System.err.println("Nu går vi in i getSensorAndReact");
+     System.err.println("Nu går vi in i getSensorAndReact");
      SensorEvent event;
      try {
        event = this.sim.getSensor(this.id);
@@ -153,7 +152,7 @@ import TSim.*;
        acquire(state);
        this.previous = this.semaphores[state];
        setSwitch(goingDown ? 0 : 3, goingDown ? TSimInterface.SWITCH_RIGHT : TSimInterface.SWITCH_LEFT);
-       System.err.println("Nu är jag initierad. Min state är: " + state);
+       System.err.println("Nu är jag initierad. Min state är: " + state + " min direction är " + goingDown);
      } catch (Exception exc2) {
        System.err.println(exc2.getMessage());
        System.exit(1);
