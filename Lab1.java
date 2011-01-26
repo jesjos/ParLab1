@@ -17,16 +17,17 @@ public class Lab1 {
   
   public Lab1() {
     sim = TSimInterface.getInstance();
-    semaphores = new Semaphore[8];
-    for (int i = 0; i < 7; i++) {
+    sim.setDebug(true);
+    semaphores = new Semaphore[9];
+    for (int i = 0; i < 8; i++) {
      semaphores[i] = new Semaphore(1, true);
     }
     one = new Thread (new Train(1,20,this.semaphores,this.sim));
-    two = new Thread (new Train(1,20,this.semaphores,this.sim));
+    two = new Thread (new Train(2,20,this.semaphores,this.sim));
   }
   
   public void start() {
-    one.start();
+    //one.start();
     two.start();
   }
   
