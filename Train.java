@@ -18,7 +18,7 @@ import TSim.*;
    
    // The time that we nap at the station.
    public static int NAP_TIME = 2000;
-   
+
    // Denotes whether the train in question is travelling down or up the track
    private boolean goingDown;
    
@@ -122,6 +122,7 @@ import TSim.*;
      this.semaphores[semaphore].release();
    }
    // private void actAndGetSensor(){
+   // private void getSensorAndReact(){
    //   SensorEvent event;
    //   
    //   // Start the main loop
@@ -267,6 +268,7 @@ import TSim.*;
            this.nextState = 2;
            acquire(2);
            setSwitch(1, state == 3 ? TSimInterface.SWITCH_RIGHT : TSimInterface.SWITCH_LEFT);
+
            start();
          }
          else if (this.nextState == 2) {
