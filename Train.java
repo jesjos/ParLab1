@@ -18,7 +18,7 @@ import TSim.*;
    
    // The time that we nap at the station.
    public static int NAP_TIME = 2000;
-   
+
    // Denotes whether the train in question is travelling down or up the track
    private boolean goingDown;
    
@@ -309,6 +309,8 @@ import TSim.*;
      nap(NAP_TIME);
      // Negate train speed and start
      this.speed = this.speed * (-1);
+     // Set going down
+     this.goingDown = !this.goingDown;
      start();
      // We want to disregard the first sensor
      getSensor();
