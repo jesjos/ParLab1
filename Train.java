@@ -14,8 +14,6 @@ import TSim.*;
  public class Train implements Runnable {
    public static Point[] switches = {new Point(17,7), new Point(15,9), new Point(4,9), new Point(3,11)};
    
-   private Semaphore previous;
-   
    // Denotes whether the train in question is travelling down or up the track
    private boolean goingDown;
    
@@ -79,7 +77,8 @@ import TSim.*;
    }
    
    // Chooses between two possible directions depending on which is available. Always goes left first. Changes switch accordingly.
-   private void chooseBetween(int left, int right, int s) {
+   private int chooseBetween(int left, int right, int s) {
+     //masterRelease();
      System.err.println("Choose between: left " + left + " right " + right);
      // Determines which direction is available and acquires it
      int direction;
@@ -92,8 +91,8 @@ import TSim.*;
      }
      // Sets the desired switch
      setSwitch(s, direction == left ? TSimInterface.SWITCH_LEFT : TSimInterface.SWITCH_RIGHT);
-     start();
-     this.nextState = direction;
+     this.state = direction;
+     return direction;
    }
    
    private void getSensor() {
@@ -102,99 +101,186 @@ import TSim.*;
        if (event.getStatus() == SensorEvent.INACTIVE) {
          event = this.sim.getSensor(this.id);
        }
-       this.semaphores[state].release();
-       System.err.println("Train # " + this.id + " has released " + state);
-       this.state = nextState;
-       System.err.println("Train # " + this.id + " has next state " + nextState);
+       // this.semaphores[state].release();
+       // System.err.println("Train # " + this.id + " has released " + state);
+       // this.state = nextState;
+       // System.err.println("Train # " + this.id + " has next state " + nextState);
      } catch (Exception e) {
        e.printStackTrace();
      }
    }
    
-   private void getSensorAndReact(){
-     SensorEvent event;
-     
-     // Start the main loop
+   private void masterRelease() {
+     this.semaphores[state].release();
+     System.err.println("Train # " + this.id + " has released " + state);
+     this.state = nextState;
+     System.err.println("Train # " + this.id + " has next state " + nextState);
+   }
+   
+   private void release(int semaphore) {
+     this.semaphores[state].release();
+   }
+   // private void getSensorAndReact(){
+   //   SensorEvent event;
+   //   
+   //   // Start the main loop
+   //   while (true) {
+   //     // Set speed to zero in order to stop if the semaphore isn't acquired
+   //     stop();
+   //   
+   //     // Logic for trains travelling downwards
+   //     if (this.goingDown) {
+   //       if (state == 0 || state == 1) {
+   //         acquire(2);
+   //         setSwitch(0, TSimInterface.SWITCH_RIGHT);
+   //         start();
+   //         this.nextState = 2;
+   //       }
+   //       else if (state == 2) {
+   //         chooseBetween(4,3,1);
+   //       }
+   //       else if (state == 5) {
+   //         chooseBetween(6,7,3);
+   //       }
+   //       else if (state == 3 || state == 4) {
+   //         masterRelease();
+   //         acquire(5);
+   //         setSwitch(2, state == 3 ? TSimInterface.SWITCH_LEFT : TSimInterface.SWITCH_RIGHT);
+   //         start();
+   //         this.nextState = 5;
+   //       }
+   //       else if (state == 6 || state == 7) {
+   //         masterRelease();
+   //         try {
+   //           this.sim.setSpeed(this.id, this.speed/2);
+   //         } catch (CommandException exc) {
+   //           exc.printStackTrace();
+   //         }
+   //         nap(Math.abs(this.speed *100));
+   //         stop();
+   //         nap(2000);
+   //         this.speed = this.speed*(-1);
+   //         this.goingDown = false;
+   //         this.nextState = 5;
+   //         start();
+   //       }
+   //     } // end if going down
+   //    
+   //     else if (!this.goingDown) {
+   //       if (state == 6 || state == 7) {
+   //         acquire(5);
+   //         setSwitch(3, state == 6 ? TSimInterface.SWITCH_LEFT : TSimInterface.SWITCH_RIGHT);
+   //         start();
+   //         this.nextState = 5;
+   //         this.state = 5;
+   //       }
+   //       else if (state == 5) {
+   //         chooseBetween(3,4,3);
+   //       }
+   //       else if (state == 3 || state == 4) {
+   //         masterRelease();
+   //         acquire(2);
+   //         setSwitch(1, state == 3 ? TSimInterface.SWITCH_RIGHT : TSimInterface.SWITCH_LEFT);
+   //         start();
+   //         this.nextState = 2;
+   //       }
+   //       else if (state == 2) {
+   //         chooseBetween(1,0,0);
+   //       }
+   //       else if (state == 0 || state == 1) {
+   //         masterRelease();
+   //         try {
+   //           this.sim.setSpeed(this.id, this.speed/2);
+   //         } catch (CommandException exc) {
+   //           exc.printStackTrace();
+   //         }
+   //         nap(Math.abs(this.speed *100));
+   //         stop();
+   //         nap(2000);
+   //         this.speed = this.speed*(-1);
+   //         this.goingDown = true;
+   //         this.nextState = 2;
+   //         start();
+   //       }
+   //     } // end if not going down
+   //     
+   //     getSensor();
+   //     
+   //   } // end while
+   // }
+   
+   private void releaseAndUpdate() {
+     release(this.state);
+     this.state = this.nextState();
+   }
+   
+   private void getSensorAndReact() {
      while (true) {
-       // Set speed to zero in order to stop if the semaphore isn't acquired
-       stop();
      
-       // Logic for trains travelling downwards
        if (this.goingDown) {
-         if (state == 0 || state == 1) {
-           acquire(2);
-           setSwitch(0, TSimInterface.SWITCH_RIGHT);
-           start();
+         if (state == nextState) {
            this.nextState = 2;
-         }
-         else if (state == 2) {
-           chooseBetween(4,3,1);
-         }
-         else if (state == 5) {
-           chooseBetween(6,7,3);
-         }
-         else if (state == 3 || state == 4) {
-           acquire(5);
-           setSwitch(2, state == 3 ? TSimInterface.SWITCH_LEFT : TSimInterface.SWITCH_RIGHT);
+           acquire(this.nextState);
+           setSwitch(0, state == 0 ? TSimInterface.SWITCH_RIGHT : TSimInterface.SWITCH_LEFT);
            start();
-           this.nextState = 5;
          }
-         else if (state == 6 || state == 7) {
-           try {
-             this.sim.setSpeed(this.id, this.speed/2);
-           } catch (CommandException exc) {
-             exc.printStackTrace();
-           }
-           nap(Math.abs(this.speed *100));
-           stop();
-           nap(2000);
-           this.speed = this.speed*(-1);
-           this.goingDown = false;
-           this.nextState = 5;
+         else if (this.nextState == 2) {
+           releaseAndUpdate();
+           nextState = chooseBetween(4,3,1);
            start();
-           getSensor();
          }
-       } // end if going down
-      
+         else if (this.nextState == 3 || this.nextState == 4) {
+           releaseAndUpdate();
+           nextState = 5;
+           acquire(this.nextState);
+           start();
+         }
+         else if (this.nextState == 5) {
+           releaseAndUpdate();
+           nextState = chooseBetween(6,7,3);
+           start();
+         }
+         else if (this.nextState == 6 || this.nextState == 7) {
+           releaseAndUpdate();
+           stationProtocol();
+         }
+       } // end going down
        else if (!this.goingDown) {
-         if (state == 6 || state == 7) {
-           acquire(5);
+         if (this.state == this.nextState) {
+           this.nextState = 5;
+           acquire(this.nextState);
            setSwitch(3, state == 6 ? TSimInterface.SWITCH_LEFT : TSimInterface.SWITCH_RIGHT);
            start();
-           this.nextState = 5;
          }
-         else if (state == 5) {
-           chooseBetween(3,4,3);
+         else if (this.nextState == 5) {
+           releaseAndUpdate();
+           this.nextState = chooseBetween(3,4,2);
+           start();
          }
-         else if (state == 3 || state == 4) {
+         else if (this.nextState == 3 || this.nextState == 4) {
+           releaseAndUpdate();
+           this.nextState = 2;
            acquire(2);
-           setSwitch(1, state == 3 ? TSimInterface.SWITCH_RIGHT : TSimInterface.SWITCH_LEFT);
            start();
-           this.nextState = 2;
          }
-         else if (state == 2) {
-           chooseBetween(1,0,0);
-         }
-         else if (state == 0 || state == 1) {
-           try {
-             this.sim.setSpeed(this.id, this.speed/2);
-           } catch (CommandException exc) {
-             exc.printStackTrace();
-           }
-           nap(Math.abs(this.speed *100));
-           stop();
-           nap(2000);
-           this.speed = this.speed*(-1);
-           this.goingDown = true;
-           this.nextState = 2;
+         else if (this.nextState == 2) {
+           releaseAndUpdate();
+           this.nextState = chooseBetween(0,1,0);
            start();
-           getSensor();
          }
-       } // end if not going down
+         else if (this.nextState == 0 || this.nextState == 1) {
+           releaseAndUpdate();
+           stationProtocol();
+         }
+       } // end not going down
        
        getSensor();
-       
+       stop();
      } // end while
+   }
+   
+   private void stationProtocol() {
+     
    }
    
    public void run() {
@@ -207,13 +293,12 @@ import TSim.*;
        e = sim.getSensor(this.id);
        if (e.getStatus() == SensorEvent.INACTIVE)
          e = sim.getSensor(this.id);
-       System.err.println(e);
        System.err.println("Y-position: " + e.getYpos());
        this.goingDown = e.getYpos() == 7;
        this.state = this.goingDown ? 0 : 6;
-       acquire(state);
-       this.previous = this.semaphores[state];
-       setSwitch(goingDown ? 0 : 3, goingDown ? TSimInterface.SWITCH_RIGHT : TSimInterface.SWITCH_LEFT);
+       // acquire(state);
+       this.nextState = goingDown ? 2 : 5;
+       // setSwitch(goingDown ? 0 : 3, goingDown ? TSimInterface.SWITCH_RIGHT : TSimInterface.SWITCH_LEFT);
        System.err.println("Nu är jag initierad. Min state är: " + state + " min direction är " + goingDown);
      } catch (Exception exc2) {
        System.err.println(exc2.getMessage());
