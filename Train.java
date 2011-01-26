@@ -74,6 +74,7 @@ import TSim.*;
    
    private void acquire(int semaphore) {
      try {
+       System.err.println("Train #" + this.id + " tries to acquire semaphore: " + semaphore + " which has permits " + this.semaphores[semaphore].availablePermits());
        this.semaphores[semaphore].acquire();
        System.err.println("Train #" + this.id + " acquired " + semaphore);
      } catch (InterruptedException e) {
@@ -94,6 +95,7 @@ import TSim.*;
      System.err.println("Choose between: left " + left + " right " + right);
      // Determines which direction is available and acquires it
      int direction;
+     System.err.println("Train #" + this.id + " tries to acquire semaphore: " + left + " which has permits " + this.semaphores[left].availablePermits());
      if (this.semaphores[left].tryAcquire()) {
        direction = left;
        System.err.println("Train #" + this.id + " acquired " + direction);
@@ -119,6 +121,7 @@ import TSim.*;
    }
    
    private void release(int semaphore) {
+     System.err.println("Train #" + this.id + " releases: " + semaphore);
      this.semaphores[semaphore].release();
    }
    // private void actAndGetSensor(){
@@ -211,6 +214,7 @@ import TSim.*;
    // }
    
    private void releaseAndUpdate() {
+     System.err.println("Train #" + this.id + " releases: " + state + " assumes state #" + nextState);
      release(this.state);
      this.state = this.nextState;
    }
