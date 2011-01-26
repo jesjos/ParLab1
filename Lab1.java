@@ -18,8 +18,8 @@ public class Lab1 {
   public Lab1() {
     sim = TSimInterface.getInstance();
     sim.setDebug(true);
-    semaphores = new Semaphore[8];
-    for (int i = 0; i < 7; i++) {
+    semaphores = new Semaphore[9];
+    for (int i = 0; i < 8; i++) {
      semaphores[i] = new Semaphore(1, true);
     }
     one = new Thread (new Train(1,20,this.semaphores,this.sim));
@@ -27,7 +27,7 @@ public class Lab1 {
   }
   
   public void start() {
-    one.start();
+    //one.start();
     two.start();
   }
   
