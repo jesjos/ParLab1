@@ -271,7 +271,7 @@ import TSim.*;
          }
          else if (this.nextState == 2) {
            releaseAndUpdate();
-           this.nextState = chooseBetween(0,1,0);
+           this.nextState = chooseBetween(1,0,0);
            start();
          }
          else if (this.nextState == 0 || this.nextState == 1) {
@@ -341,9 +341,11 @@ import TSim.*;
      actAndGetSensor();
      
    }
+   
+   // Naps a given number of milliseconds. Makes sure nap times are always positive
    private static void nap(int millisecs) {
      try {
-       Thread.sleep(millisecs);
+       Thread.sleep(Math.abs(millisecs));
      } catch (InterruptedException e) {
        System.err.println(e.getMessage());
      }
