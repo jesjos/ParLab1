@@ -35,6 +35,9 @@ import TSim.*;
    
    // The current SensorEvent being handled
    private SensorEvent event;
+	 
+	 // The previous sensor that the train reacted to
+	 private Point previousSensor;
    
    // The simulator controller
    private TSimInterface sim;
@@ -112,9 +115,13 @@ import TSim.*;
    private void getSensor() {
      try {
        event = this.sim.getSensor(this.id);
-       if (event.getStatus() == SensorEvent.INACTIVE) {
-         event = this.sim.getSensor(this.id);
-       }
+			 if (new Point(event.getXpos(),event.getYpos()).equals(previousSensor)) {
+				event = this.sim.getSensor(this.id);
+			 }
+			 this.previousSensor = new Point(event.getXpos(), event.getYpos());
+//       if (event.getStatus() == SensorEvent.INACTIVE) {
+//         event = this.sim.getSensor(this.id);
+//       }
      } catch (Exception e) {
        e.printStackTrace();
      }
@@ -228,6 +235,7 @@ import TSim.*;
      
        if (this.goingDown) {
          if (state == nextState) {
+					 System.err.println("Train #" + this.id + " has state " + this.state + " nextState " + this.nextState);
            this.nextState = 2;
            acquire(this.nextState);
            setSwitch(0, state == 0 ? TSimInterface.SWITCH_RIGHT : TSimInterface.SWITCH_LEFT);
@@ -257,6 +265,7 @@ import TSim.*;
        } // end going down
        else if (!this.goingDown) {
          if (this.state == this.nextState) {
+					 System.err.println("Train #" + this.id + " has state " + this.state + " nextState " + this.nextState);
            this.nextState = 5;
            acquire(this.nextState);
            setSwitch(3, state == 6 ? TSimInterface.SWITCH_LEFT : TSimInterface.SWITCH_RIGHT);
@@ -294,14 +303,17 @@ import TSim.*;
      System.err.println("Station protocol");
      start();
      // Slow down in order not to barge into the station
-     if (this.speed > 20) {
-       setSpeed(20);
+     if (Math.abs(this.speed) > 20) {
+       setSpeed(this.speed > 0 ? 20 : -20);
      }
      // Wait for next sensor and stop, trigger on INACTIVE event in order to minimize trouble after turning around
      try {
        SensorEvent event = this.sim.getSensor(this.id);
        if (event.getStatus() == SensorEvent.INACTIVE) {
          event = this.sim.getSensor(this.id);
+				 if (event.getStatus() == SensorEvent.ACTIVE) {
+				 	 event = this.sim.getSensor(this.id);
+				 }
        }
      } catch (Exception e) {
        e.printStackTrace();
@@ -312,13 +324,14 @@ import TSim.*;
      nap(this.speed > 20 ? 200 : this.speed * 20);
      // Nap at station
      nap(NAP_TIME);
-     // Negate train speed and start
+     // Negate train speed
      this.speed = this.speed * (-1);
      // Set going down
      this.goingDown = !this.goingDown;
      start();
      // We want to disregard the first sensor
      getSensor();
+		 System.err.println("Train #" + this.id + " disregarded a sensor after starting again");
    }
    
    public void run() {
@@ -331,10 +344,12 @@ import TSim.*;
        e = sim.getSensor(this.id);
        if (e.getStatus() == SensorEvent.ACTIVE)
          e = sim.getSensor(this.id);
+			 this.previousSensor = new Point(e.getXpos(), e.getYpos());
        System.err.println("Y-position: " + e.getYpos());
        this.goingDown = e.getYpos() == 3;
        this.state = this.goingDown ? 0 : 6;
        this.nextState = this.state;
+			 acquire(this.state);
        System.err.println("Nu är jag initierad. Min state är: " + state + " min direction är " + goingDown);
      } catch (Exception exc2) {
        System.err.println(exc2.getMessage());
