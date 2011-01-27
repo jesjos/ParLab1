@@ -113,112 +113,27 @@ import TSim.*;
    }
    
    private void getSensor() {
-     try {
-       event = this.sim.getSensor(this.id);
-			 if (new Point(event.getXpos(),event.getYpos()).equals(previousSensor)) {
-				event = this.sim.getSensor(this.id);
-			 }
-			 this.previousSensor = new Point(event.getXpos(), event.getYpos());
-//       if (event.getStatus() == SensorEvent.INACTIVE) {
-//         event = this.sim.getSensor(this.id);
-//       }
-     } catch (Exception e) {
-       e.printStackTrace();
-     }
+	   try {
+		   System.err.println("Train #" + this.id + " has previous sensor " + previousSensor.x + " " + previousSensor.y);
+		   event = this.sim.getSensor(this.id);
+		   System.err.println("Train #" + this.id + " found sensor " + event.getXpos() + " " + event.getYpos());
+		   if (new Point(event.getXpos(),event.getYpos()).equals(previousSensor)) {
+			   event = this.sim.getSensor(this.id);
+			   System.err.println("Train #" + this.id + " found another sensor " + event.getXpos() + " " + event.getYpos());
+		   }
+		   this.previousSensor = new Point(event.getXpos(), event.getYpos());
+		   //       if (event.getStatus() == SensorEvent.INACTIVE) {
+		   //         event = this.sim.getSensor(this.id);
+		   //       }
+	   } catch (Exception e) {
+		   e.printStackTrace();
+	   }
    }
    
    private void release(int semaphore) {
      System.err.println("Train #" + this.id + " releases: " + semaphore);
      this.semaphores[semaphore].release();
    }
-   // private void actAndGetSensor(){
-   //   SensorEvent event;
-   //   
-   //   // Start the main loop
-   //   while (true) {
-   //     // Set speed to zero in order to stop if the semaphore isn't acquired
-   //     stop();
-   //   
-   //     // Logic for trains travelling downwards
-   //     if (this.goingDown) {
-   //       if (state == 0 || state == 1) {
-   //         acquire(2);
-   //         setSwitch(0, TSimInterface.SWITCH_RIGHT);
-   //         start();
-   //         this.nextState = 2;
-   //       }
-   //       else if (state == 2) {
-   //         chooseBetween(4,3,1);
-   //       }
-   //       else if (state == 5) {
-   //         chooseBetween(6,7,3);
-   //       }
-   //       else if (state == 3 || state == 4) {
-   //         masterRelease();
-   //         acquire(5);
-   //         setSwitch(2, state == 3 ? TSimInterface.SWITCH_LEFT : TSimInterface.SWITCH_RIGHT);
-   //         start();
-   //         this.nextState = 5;
-   //       }
-   //       else if (state == 6 || state == 7) {
-   //         masterRelease();
-   //         try {
-   //           this.sim.setSpeed(this.id, this.speed/2);
-   //         } catch (CommandException exc) {
-   //           exc.printStackTrace();
-   //         }
-   //         nap(Math.abs(this.speed *100));
-   //         stop();
-   //         nap(2000);
-   //         this.speed = this.speed*(-1);
-   //         this.goingDown = false;
-   //         this.nextState = 5;
-   //         start();
-   //       }
-   //     } // end if going down
-   //    
-   //     else if (!this.goingDown) {
-   //       if (state == 6 || state == 7) {
-   //         acquire(5);
-   //         setSwitch(3, state == 6 ? TSimInterface.SWITCH_LEFT : TSimInterface.SWITCH_RIGHT);
-   //         start();
-   //         this.nextState = 5;
-   //         this.state = 5;
-   //       }
-   //       else if (state == 5) {
-   //         chooseBetween(3,4,3);
-   //       }
-   //       else if (state == 3 || state == 4) {
-   //         masterRelease();
-   //         acquire(2);
-   //         setSwitch(1, state == 3 ? TSimInterface.SWITCH_RIGHT : TSimInterface.SWITCH_LEFT);
-   //         start();
-   //         this.nextState = 2;
-   //       }
-   //       else if (state == 2) {
-   //         chooseBetween(1,0,0);
-   //       }
-   //       else if (state == 0 || state == 1) {
-   //         masterRelease();
-   //         try {
-   //           this.sim.setSpeed(this.id, this.speed/2);
-   //         } catch (CommandException exc) {
-   //           exc.printStackTrace();
-   //         }
-   //         nap(Math.abs(this.speed *100));
-   //         stop();
-   //         nap(2000);
-   //         this.speed = this.speed*(-1);
-   //         this.goingDown = true;
-   //         this.nextState = 2;
-   //         start();
-   //       }
-   //     } // end if not going down
-   //     
-   //     getSensor();
-   //     
-   //   } // end while
-   // }
    
    private void releaseAndUpdate() {
      System.err.println("Train #" + this.id + " releases: " + state + " assumes state #" + nextState);
@@ -310,11 +225,12 @@ import TSim.*;
      try {
        SensorEvent event = this.sim.getSensor(this.id);
        if (event.getStatus() == SensorEvent.INACTIVE) {
-         event = this.sim.getSensor(this.id);
-				 if (event.getStatus() == SensorEvent.ACTIVE) {
-				 	 event = this.sim.getSensor(this.id);
-				 }
+    	   event = this.sim.getSensor(this.id);
+    	   if (event.getStatus() == SensorEvent.ACTIVE) {
+    		   event = this.sim.getSensor(this.id);
+    	   }
        }
+       this.previousSensor = new Point(event.getXpos(), event.getYpos());
      } catch (Exception e) {
        e.printStackTrace();
        System.exit(1);
