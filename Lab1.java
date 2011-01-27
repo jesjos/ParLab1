@@ -19,9 +19,10 @@ public class Lab1 {
     sim = TSimInterface.getInstance();
     sim.setDebug(true);
     semaphores = new Semaphore[9];
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 9; i++) {
      semaphores[i] = new Semaphore(1, true);
     }
+    System.err.println("Semaphores number: " + semaphores.length);
     one = new Thread (new Train(1,speed1,this.semaphores,this.sim));
     two = new Thread (new Train(2,speed2,this.semaphores,this.sim));
   }
