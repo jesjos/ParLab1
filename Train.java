@@ -216,7 +216,8 @@ import TSim.*;
    private void releaseAndUpdate() {
      System.err.println("Train #" + this.id + " releases: " + state + " assumes state #" + nextState);
      release(this.state);
-     this.state = this.nextState;
+     System.err.println("Semaphore " + state + "has permits " + this.semaphores[state].availablePermits());
+     this.state = this.nextState;     
    }
    
    private void actAndGetSensor() {
