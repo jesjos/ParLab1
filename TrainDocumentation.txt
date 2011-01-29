@@ -1,0 +1,20 @@
+Documentation 
+The documentation is intended as an abstract description of your solution – do not translate your code into English.
+The documentation should include everything needed for easy understanding of the solution. In particular we demand that your documentation contains discussion on:
+
+    * Placement of the sensors,
+    * Choice of critical sections, and
+    * Maximum train speed and the reason for it.
+
+Assignment 1 - Trainspotting. Jesper Josefsson, Anmar Khazal 2011-01-29
+
+On an abstract level critical sections are defined as the track between a station and a switch or between two switches.
+Two trains are not allowed to use the same critical section at a given time. To ensure mutual exclusion each critical section or state is represented by a binary semaphore. 
+
+The sensors are placed before and after the entry and exit points of critical sections. Furthermore sensors are placed close to the stations to trigger the final stop at the station. To ensure good train flow the sensors need to be placed as close as possible to the entry and exit points. But since trains have a stopping distance you have to take this into consideration when placing the sensors. The current placement is a compromise between good train flow and high maximum speed. 
+The maximum speed is thus 22.
+
+On a code level a critical section is defined as the section where,for a given state, a train starts, flips switches and waits for the next sensor.
+
+
+
