@@ -8,16 +8,7 @@ import TSim.*;
  * Assumptions:
  * A train either starts at the top-most track or at the second-to-last track, i.e. state 0 or 6
  * We use this information to intitialize the logic.
- * States are arranged as follows: 
- * 0 - the topmost track
- * 1 - the other track which connects to the upper station
- * 2 - the track between the first two switches
- * 3 - the upper middle double track
- * 4 - the lower middle double track
- * 5 - track connecting the middle double tracks and the lower station tracks
- * 6 - upper lower station track
- * 7 - lower lower station track
- * 8 - the X-intersection at the top.
+ *
  * @author Jesper Josefsson
  * @author Anmar Khazal
  */
@@ -109,6 +100,7 @@ public class Train implements Runnable {
 			this.semaphores[semaphore].acquire();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 	// Sets the switch to the given direction
@@ -117,6 +109,7 @@ public class Train implements Runnable {
 			this.sim.setSwitch(switches[s].x, switches[s].y, direction);
 		} catch (CommandException e) {
 			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 
