@@ -2,6 +2,7 @@ Assignment 1 - Trainspotting
 Jesper Josefsson, Anmar Khazal 
 2011-01-29
 
+<<<<<<< HEAD:TrainDocumentation.txt
 ########################################
 -- Documentation UPDATE
 The sensor on the other track of the top station
@@ -14,6 +15,9 @@ Otherwise a slow train starting at the upper station can collide
 at the intersection with a fast train starting at the lower station.
 The call is conditional, as the train starting from the lower station does not need to aqcuire the intersection
 during initialization.
+=======
+#################
+>>>>>>> 0019cfa509b5f9577f49bf6b865d1d4d12dca4e2:TrainDocumentation.txt
 
 -- CRITICAL SECTIONS OF THE MAP AND SEMAPHORES
 

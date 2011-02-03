@@ -27,7 +27,11 @@ public class Train implements Runnable {
 		return rand.nextInt(1200);
 	}
 
+<<<<<<< HEAD:Train.java
 	// Denotes whether the train in question is traveling down or up the track
+=======
+	// Denotes whether the train in question is travelling down or up the track
+>>>>>>> 0019cfa509b5f9577f49bf6b865d1d4d12dca4e2:Train.java
 	private boolean goingDown;
 	
 	// The state towards which the train is traveling
