@@ -1,0 +1,57 @@
+Assignment 1 - Trainspotting
+Jesper Josefsson, Anmar Khazal 
+2011-01-29
+
+########################################
+-- Documentation UPDATE
+The sensor on the other track of the top station
+was too close to the intersection. The trains do not
+crash after moving it closer to the station.
+
+The conditional call to crossroads() in run() is needed to avoid a collision 
+at the upper intersection during initialization.
+Otherwise a slow train starting at the upper station can collide 
+at the intersection with a fast train starting at the lower station.
+The call is conditional, as the train starting from the lower station does not need to aqcuire the intersection
+during initialization.
+
+-- CRITICAL SECTIONS OF THE MAP AND SEMAPHORES
+
+On an abstract level critical sections are defined as the track between a station and a switch or between two switches.
+Two trains are not allowed to use the same critical section at a given time, 
+nor to manipulate switches connected to those sections at the same time.
+To ensure mutual exclusion each critical section or state, as we will call them hence, is represented by a binary semaphore. 
+
+-- SENSORS AND MAXIMUM SPEED
+
+The sensors are placed before and after the entry and exit points of states. 
+An entry point can be e.g. a switch or just a piece of track near an intersection. Further sensors are placed close to the stations to trigger the final stop at the station. 
+When a train reaches a sensor it can release its previous state. Therefore, to ensure good train flow the sensors need to be placed as close as possible to the entry and exit points. However, trains have a stopping distance that has to taken into consideration when placing the sensors, i.e. they have to be placed further away from the point. The current placement is a compromise between good train flow and high maximum speed. 
+The maximum speed is 22. Speeds over that will cause derailment at switches, or blocked switches because of trains stopping over them or crasches at stations.
+
+-- CRITICAL SECTIONS OF CODE
+
+On a code level a critical section is defined as the section where, for a given state, a train starts, flips switches and waits for the next sensor. The tasks to be performed in the critical section vary based on what state the train is in. 
+
+-- STATES
+
+The states are defined as follows:
+0 - the topmost track
+1 - the other track of the top station
+2 - the track between the first two switches
+3 and 4 - the double tracks in the middle of the system, 3 being the topmost
+5 - the track between the double track and the lower station
+6 - the upper track of the lower station
+7 - the lower track of the lower station
+
+-- TESTING
+
+Tests have been made with a one slow and one fast train (5 and 22), and two fast trains (22,22) and two slow trains (2,2). Tests ran 5 minutes each.
+Longer tests would have been more prudent.
+
+-- DISCUSSION
+
+The solution uses 9 semaphores. All of the double tracks (both stations and the middle section) can be implemented using only one semaphore each. For example, a train that acquires the semaphore goes left and a train that fails to acquire it goes right.
+We use a semaphore for each track for reasons of clarity.
+
+
