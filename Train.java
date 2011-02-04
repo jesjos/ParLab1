@@ -5,9 +5,7 @@ import TSim.*;
 
 /**
  * A train thread.
- * Assumptions:
- * A train either starts at the top-most track or at the second-to-last track, i.e. state 0 or 6
- * We use this information to intitialize the logic.
+ * Assumption: train 1 starts at the topmost track, train 2 at the lower station.
  *
  * @author Jesper Josefsson
  * @author Anmar Khazal
@@ -299,7 +297,7 @@ public class Train implements Runnable {
 	}
 	
 	/**
-	 * Starts the train. Initializes the logic by checking the coordinates of the first sensor that the train passes.
+	 * Starts the train. Initializes the logic by checking the id of the train.
 	 */
 	public void run() {
 		SensorEvent e;
@@ -311,7 +309,7 @@ public class Train implements Runnable {
 		
 		// Start the train
 		start();
-		// Wait for the sensor and record the initial direction of the train
+		// Wait for the sensor
 		try {
 			e = sim.getSensor(this.id);
 			if (e.getStatus() == SensorEvent.ACTIVE)
